@@ -12,65 +12,40 @@ public class ATargetGrid {
     @Test
     void willNotSanctionADuplicateShot(){
         TargetGrid grid = new TargetGrid();
-        try {
-            ShotResult result = ShotResult.miss(new Coordinate(4, 5));
-            grid.receiveShotResult(result);
-            boolean test = grid.isValidShot(new Coordinate(4, 5));
-            assertFalse(test);
-        } catch (Exception e) {
-            assertFalse(true);
-        }  
+        ShotResult result = ShotResult.miss(new Coordinate(4, 5));
+        grid.receiveShotResult(result);
+        assertFalse(grid.isValidShot(new Coordinate(4, 5)));
     }
 
     @Test 
     void isOKWithUniqueShot(){
         TargetGrid grid = new TargetGrid();
-        try {
-            ShotResult result = ShotResult.miss(new Coordinate(5, 5));
-            grid.receiveShotResult(result);
-            boolean test = grid.isValidShot(new Coordinate(4, 5));
-            assertTrue(test);
-        } catch (Exception e) {
-            assertFalse(true);
-        }
+        ShotResult result = ShotResult.miss(new Coordinate(5, 5));
+        grid.receiveShotResult(result);
+        assertTrue(grid.isValidShot(new Coordinate(4, 5)));
     }
     
     @Test
     void canPrintEmptyGrid(){
         TargetGrid grid = new TargetGrid();
-        grid.print();
+        assertTrue(grid.toString().contains("   ."));
     }
 
     @Test
     void canPrintGridWithMisses(){
         TargetGrid grid = new TargetGrid();
-       
-        try {
-            ShotResult result = ShotResult.miss(new Coordinate(4, 5));
-            grid.receiveShotResult(result);
-            result = ShotResult.miss(new Coordinate(5, 5));
-            grid.receiveShotResult(result);
-            result = ShotResult.miss(new Coordinate(6, 5));
-            grid.receiveShotResult(result);
-        } catch (Exception e) {
-            assertFalse(true);
-        } 
-        grid.print();
+        grid.receiveShotResult(ShotResult.miss(new Coordinate(4, 5)));
+        grid.receiveShotResult(ShotResult.miss(new Coordinate(5, 5)));
+        grid.receiveShotResult(ShotResult.miss(new Coordinate(6, 5)));
+        assertTrue(grid.toString().contains(" o ."));
     }
 
     @Test
     void canPrintGridWithHits(){
         TargetGrid grid = new TargetGrid();
-        try {
-            ShotResult result = ShotResult.hit(new Coordinate(4, 5));
-            grid.receiveShotResult(result);
-            result = ShotResult.hit(new Coordinate(5, 5));
-            grid.receiveShotResult(result);
-            result = ShotResult.hit(new Coordinate(6, 5));
-            grid.receiveShotResult(result);
-        } catch (Exception e) {
-            assertFalse(true);
-        } 
-        grid.print();
+        grid.receiveShotResult(ShotResult.hit(new Coordinate(4, 5)));
+        grid.receiveShotResult(ShotResult.hit(new Coordinate(5, 5)));
+        grid.receiveShotResult(ShotResult.sunk(new Coordinate(6, 5), "Submarine"));
+        assertTrue(grid.toString().contains(" * ."));
     }
 }

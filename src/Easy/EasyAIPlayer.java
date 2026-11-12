@@ -47,7 +47,7 @@ public class EasyAIPlayer implements Player {
 	@Override
     public void placeShips() {
 		this.ships = factory.getShips();
-        oceanGrid.placeShips(this.ships);
+        oceanGrid.assignShips(this.ships);
     }
 
     @Override

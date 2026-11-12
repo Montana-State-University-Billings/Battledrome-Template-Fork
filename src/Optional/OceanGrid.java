@@ -7,55 +7,42 @@ import Common.Coordinate;
 import Common.ShotResult;
 
 public class OceanGrid extends Grid {
-    private List<Ship> ships = new ArrayList<Ship>();
+    private List<Ship> ships = new ArrayList<>();
 
     public OceanGrid(){
         super();
     }
 
-    public ShotResult receiveShot(Coordinate location){
-        Cell cell = cellAtLocation(location);
-
-        // shot lands on empty cell
-        if(cell.getState() == CellState.EMPTY || cell.getState() == CellState.MISS){
-            cell.setState(CellState.MISS);
-            ShotResult result = ShotResult.miss(location);
-            return result;
-        }
-
-        // shot lands on ship
-        if(cell.getState() == CellState.OCCUPIED){
-            cell.setState(CellState.HIT);
-            cell.getShip().registerHit(location);
-            if(cell.getShip().isSunk()){
-                ShotResult result = ShotResult.sunk(location, cell.getShip().getName());
-                return result;
-            } else {
-                ShotResult result = ShotResult.hit(location);
-                return result;
-            }
-        }
-
-        // only possibility left is a HIT, which is a duplicate shot
-        return ShotResult.hit(location);
-    }
-
-    public void placeShips(List<Ship> ships){
-        for(Ship ship : ships){
+    public void assignShips(List<Ship> ships){
+        for (Ship ship : ships) {
             this.ships.add(ship);
-            for(Coordinate location: ship.getCoordinates()){
-                cellAtLocation(location).setState(CellState.OCCUPIED);
-                cellAtLocation(location).setShip(ship);
-            }
-        } 
-    }
-
-    public boolean shipsAreSunk(){
-        for(Ship ship : ships){
-            if(!ship.isSunk()){
-                return false;
+            for (Coordinate c : ship.getCoordinates()) {
+                Cell cell = cellAtCoordinate(c);
+                cell.setState(CellState.OCCUPIED);
+                cell.setShip(ship);
             }
         }
-        return true;
+    }
+
+    public ShotResult receiveShot(Coordinate c){
+        Cell cell = cellAtCoordinate(c);
+        ShotResult retVal;
+        if(cell.getState() == CellState.OCCUPIED){
+            // A HIT or SUNK
+            Ship ship = cell.getShip();
+            ship.registerHitAt(c);
+            cell.setState(CellState.HIT);
+            if(ship.isSunk()){
+                retVal = ShotResult.sunk(c, ship.getName());
+            } else {
+                retVal = ShotResult.hit(c);
+            }
+            return retVal;
+        }
+
+        // anything else is a MISS
+        cell.setState(CellState.MISS);
+        retVal = ShotResult.miss(c);
+        return retVal;
     }
 }

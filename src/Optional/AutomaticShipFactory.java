@@ -5,13 +5,20 @@ import Common.Direction;
 
 public class AutomaticShipFactory extends ShipFactory {
 
+    private static final int MAX_ATTEMPTS_PER_SHIP = 1000;
+
     @Override
-    protected Coordinate getStartCoordinate(Ship ship) throws Exception {
+    protected int maxPlacementAttempts() {
+        return MAX_ATTEMPTS_PER_SHIP;
+    }
+
+    @Override
+    protected Coordinate getStartCoordinate(Ship ship) {
         return Coordinate.randomCoordinate();
     }
 
     @Override
-    protected Direction getStartDirection(Ship ship) throws Exception {
+    protected Direction getStartDirection(Ship ship) {
         return Direction.randomDirection();
-    }   
+    }
 }

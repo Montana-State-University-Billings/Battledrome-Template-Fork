@@ -1,16 +1,18 @@
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import Common.Coordinate;
 import Optional.AutomaticShipFactory;
-import Optional.Order;
 import Optional.Ship;
 import Optional.ShipFactory;
 
@@ -27,85 +29,73 @@ public class AShipFactory {
     void producesFiveShips(){
         List<Ship> ships = factory.getShips();
         assertEquals(5, ships.size());
+        assertEquals(Ship.specifications, ships.stream().collect(
+            Collectors.toMap(Ship::getName, Ship::getLength)));
     }
 
     @Test
-    void detectsOverlap() throws Exception {
-        Ship one = new Ship("Submarine", 3);
-        one.setCoordinates(Set.of(
+    void detectsOverlap(){
+        List<Coordinate> coordinates = List.of(
             new Coordinate(2,3),
             new Coordinate(2,4),
             new Coordinate(2,5)
-        ));
-        Ship two = new Ship("Destroyer", 4);
-        two.setCoordinates(Set.of(
+        );
+        Set<Coordinate> occupied = Set.of(
             new Coordinate(1,3),
             new Coordinate(2,3),
             new Coordinate(3,3),
             new Coordinate(4,3)
-        ));
-        assertTrue(factory.shipOverlapsExistingShip(one, List.of(two)));
+        );
+        assertTrue(overlap(coordinates, occupied));
     }
 
     @Test
-    void detectsLackOfOverlap() throws Exception {
-        Ship one = new Ship("Submarine", 3);
-        one.setCoordinates(Set.of(
+    void detectsLackOfOverlap(){
+        List<Coordinate> coordinates = List.of(
             new Coordinate(2,3),
             new Coordinate(2,4),
             new Coordinate(2,5)
-        ));
-        Ship two = new Ship("Destroyer", 4);
-        two.setCoordinates(Set.of(
+        );
+        Set<Coordinate> occupied = Set.of(
             new Coordinate(5,3),
             new Coordinate(5,4),
             new Coordinate(5,5),
             new Coordinate(5,6)
-        ));
-        assertFalse(factory.shipOverlapsExistingShip(one, List.of(two)));
+        );
+        assertFalse(overlap(coordinates, occupied));
     }
 
     @Test
-    void returnsShipsOrderedByName(){
-        List<Ship> ships = factory.getShipsSortedByName(Order.ASC);
-        assertEquals(5, ships.size());
-        assertEquals(ships.get(0).getName(), "Battleship");
-        assertEquals(ships.get(1).getName(), "Carrier");
-        assertEquals(ships.get(2).getName(), "Destroyer");
-        assertEquals(ships.get(3).getName(), "Patrol Boat");
-        assertEquals(ships.get(4).getName(), "Submarine");
+    void placesEveryShipWithoutOverlap(){
+        List<Ship> ships = factory.getShips();
+        Set<Coordinate> occupied = new HashSet<>();
+
+        for(Ship ship : ships){
+            assertEquals(ship.getLength(), ship.getCoordinates().size());
+            for(Coordinate coordinate : ship.getCoordinates()){
+                assertTrue(occupied.add(coordinate), "Ships must not overlap at " + coordinate);
+            }
+        }
     }
 
     @Test
-    void returnsShipsOrderedByNameDesc(){
-        List<Ship> ships = factory.getShipsSortedByName(Order.DESC);
-        assertEquals(5, ships.size());
-        assertEquals(ships.get(0).getName(), "Submarine");
-        assertEquals(ships.get(1).getName(), "Patrol Boat");
-        assertEquals(ships.get(2).getName(), "Destroyer");
-        assertEquals(ships.get(3).getName(), "Carrier");
-        assertEquals(ships.get(4).getName(), "Battleship");
+    void createsFreshShipsForEachFleet(){
+        List<Ship> firstFleet = factory.getShips();
+        List<Ship> secondFleet = factory.getShips();
+
+        assertEquals(firstFleet.size(), secondFleet.size());
+        for(int i = 0; i < firstFleet.size(); i++){
+            assertNotSame(firstFleet.get(i), secondFleet.get(i));
+        }
     }
 
-    @Test
-    void returnsShipsOrderedByLength(){
-        List<Ship> ships = factory.getShipsSortedByLength(Order.ASC);
-        assertEquals(5, ships.size());
-        assertEquals(ships.get(0).getLength(), 2);
-        assertEquals(ships.get(1).getLength(), 3);
-        assertEquals(ships.get(2).getLength(), 3);
-        assertEquals(ships.get(3).getLength(), 4);
-        assertEquals(ships.get(4).getLength(), 5);
+    private boolean overlap(List<Coordinate> coordinates, Set<Coordinate> occupied){
+        return new TestableShipFactory().overlaps(coordinates, occupied);
     }
 
-    @Test
-    void returnsShipsOrderedByLengthDesc(){
-        List<Ship> ships = factory.getShipsSortedByLength(Order.DESC);
-        assertEquals(5, ships.size());
-        assertEquals(ships.get(0).getLength(), 5);
-        assertEquals(ships.get(1).getLength(), 4);
-        assertEquals(ships.get(2).getLength(), 3);
-        assertEquals(ships.get(3).getLength(), 3);
-        assertEquals(ships.get(4).getLength(), 2);
+    private static class TestableShipFactory extends AutomaticShipFactory {
+        boolean overlaps(List<Coordinate> coordinates, Set<Coordinate> occupied){
+            return coordinatesOverlapExistingCoordinates(coordinates, occupied);
+        }
     }
 }

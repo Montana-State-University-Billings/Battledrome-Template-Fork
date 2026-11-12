@@ -3,57 +3,68 @@ package Optional;
 import Common.Coordinate;
 
 public abstract class Grid {
-    public Cell[][] cells = new Cell[10][10];
+    private Cell[][] cells = new Cell[10][10];
 
     public Grid(){
-        for (int i = 0; i < 10; i++){
-            for (int j = 0; j < 10; j++){
-                cells[i][j] = new Cell();
+        for(int row = 0; row < 10; row++){
+            for(int column = 0; column < 10; column++){
+                Cell cell = new Cell();
+                cells[row][column] = cell;
             }
         }
     }
-
-    public Cell cellAtLocation(Coordinate location){
-        return cells[location.getRow()][location.getColumn()];
+    
+    protected Cell cellAtCoordinate(Coordinate c){
+        return cells[c.getRow()][c.getColumn()];
     }
 
-    public void print(){
-        printHeader();
-        for(int i = 0; i < 10; i++){
-            printRow(i);
+    public String toString(){
+        // print out console representation of the grid
+        String result = new String();
+        result += getHeader();
+
+        for(int row = 0; row < 10; row++){
+            result += getRow(row);
         }
-
+        return result;
     }
 
-    private void printHeader(){
-        System.out.println("   . 1 . 2 . 3 . 4 . 5 . 6 . 7 . 8 . 9 . 10.");
-    }
-
-    private void printRow(int row){
-        char firstLetter = (char)(row + 97);
-        String rowLetter = String.format("%s", firstLetter).toUpperCase();
-        System.out.print(String.format(" %s .", rowLetter));
-        for (int col = 0; col < 10; col++){
-            Cell cell = cells[row][col];
-            CellState state = cell.getState();
-            switch(state){
-                case EMPTY:
-                    System.out.print("   .");
-                    break;
-                case MISS:
-                    System.out.print(" o .");
-                    break;
-                case HIT:
-                    System.out.print(" * .");
-                    break;
-                case OCCUPIED:
-                    System.out.printf(" # .");
-                    break;
-                default:
-                    System.out.print("   .");
-                    break;
-            } 
+    private String getRow(int rowNumber){
+		char letter = (char)(rowNumber + 65);
+        String result = "| " + letter + " |";
+        for(int column = 0; column < 10; column++){
+            switch(cells[rowNumber][column].getState()){
+                case EMPTY -> result += "   .";
+                case HIT -> result += " * .";
+                case MISS -> result += " o .";
+                case OCCUPIED -> result += " # .";
+            }
         }
-        System.out.print("\n");
+        result += "\n";
+        return result;
+    }
+
+    private String getHeader(){
+        String result = getBorder();
+        // first column
+        result += "|   |";
+        for(int column = 1; column < 11; column++){
+			result += String.format("%2d", column);
+			result += " |";
+        }
+        result += "\n";
+        result += getBorder();
+        return result;
+    }
+
+    private String getBorder(){
+        // blank column
+        String result = "+---+";
+        // letter columns
+        for(int column = 0; column < 10; column++){
+            result += "---+";
+        }
+        result += "\n";
+        return result;
     }
 }

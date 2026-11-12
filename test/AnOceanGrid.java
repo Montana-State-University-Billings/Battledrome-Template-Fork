@@ -2,9 +2,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,45 +22,29 @@ public class AnOceanGrid {
     public void init(){
         this.grid = new OceanGrid();
         Ship ship = new Ship("Submarine", 3);
-        try {
-            ship.setCoordinates(Set.of(new Coordinate(4,5), new Coordinate(5,5), new Coordinate(6,5)));
-            grid.placeShips(Arrays.asList(ship));
-        } catch(Exception e){
-            assertFalse(true);
-        }
+        ship.setCoordinates(List.of(new Coordinate(4,5), new Coordinate(5,5), new Coordinate(6,5)));
+        grid.assignShips(List.of(ship));
     }
 
     @Test
     public void canRegisterAHitOnAShip(){
-        try {
-            ShotResult result = grid.receiveShot(new Coordinate(4, 5));
-            assertEquals(ShotOutcome.HIT, result.getOutcome());
-        } catch(Exception e){
-            assertFalse(true);
-        } 
+        ShotResult result = grid.receiveShot(new Coordinate(4, 5));
+        assertEquals(ShotOutcome.HIT, result.getOutcome());
     }
 
     @Test
     public void canNoteMissOnAShip(){
-        try {
-            ShotResult result = grid.receiveShot(new Coordinate(2, 1));
-            assertEquals(ShotOutcome.MISS, result.getOutcome());
-        } catch(Exception e){
-            assertFalse(true);
-        }
+        ShotResult result = grid.receiveShot(new Coordinate(2, 1));
+        assertEquals(ShotOutcome.MISS, result.getOutcome());
     }
 
     @Test
     public void canSinkAShip(){
-        try {
-            ShotResult result = grid.receiveShot(new Coordinate(4, 5));
-            result = grid.receiveShot(new Coordinate(5, 5));
-            result = grid.receiveShot(new Coordinate(6, 5));
-            assertEquals(ShotOutcome.SUNK, result.getOutcome());
-            assertEquals("Submarine", result.getShipName());
-        } catch(Exception e){
-            assertFalse(true);
-        }
+        grid.receiveShot(new Coordinate(4, 5));
+        grid.receiveShot(new Coordinate(5, 5));
+        ShotResult result = grid.receiveShot(new Coordinate(6, 5));
+        assertEquals(ShotOutcome.SUNK, result.getOutcome());
+        assertEquals("Submarine", result.getShipName().orElseThrow());
     }
 
     @Test
@@ -72,7 +54,7 @@ public class AnOceanGrid {
         
         // put ships on grid
         List<Ship> ships = sf.getShips();
-        grid.placeShips(ships);
+        grid.assignShips(ships);
 
         // shoot all of their coordinates
         for(Ship ship : ships){
@@ -82,7 +64,7 @@ public class AnOceanGrid {
         }
 
         // test for all sunk
-        assertTrue(grid.shipsAreSunk());
+        assertTrue(ships.stream().allMatch(Ship::isSunk));
     }
 
     @Test
@@ -92,41 +74,32 @@ public class AnOceanGrid {
         
         // put ships on grid
         List<Ship> ships = sf.getShips();
-        grid.placeShips(ships);
+        grid.assignShips(ships);
 
         // don't shoot at any of them
 
         // test for all sunk
-        assertFalse(grid.shipsAreSunk());
+        assertFalse(ships.stream().allMatch(Ship::isSunk));
     }
 
     @Test
     public void testPrintOccupied(){
-        grid.print();
+        System.out.println(grid);
     }
 
     @SuppressWarnings("unused")
     @Test
     public void testPrintOccupiedAndHit(){
-        try {
-            ShotResult result = grid.receiveShot(new Coordinate(4, 5));
-            grid.print();
-        } catch(Exception e){
-            assertFalse(true);
-        }
+        grid.receiveShot(new Coordinate(4, 5));
+        System.out.println(grid);
     }
 
     @SuppressWarnings("unused")
     @Test
     public void testPrintOccupiedAndHitAndMiss(){
-        try {
-            ShotResult result;
-            result = grid.receiveShot(new Coordinate(4, 5));
-            result = grid.receiveShot(new Coordinate("C3"));
-            grid.print();
-        } catch(Exception e){
-            assertFalse(true);
-        }
+        grid.receiveShot(new Coordinate(4, 5));
+        grid.receiveShot(new Coordinate("C3"));
+        System.out.println(grid);
     }
 
     @Test
@@ -135,7 +108,7 @@ public class AnOceanGrid {
         List<Ship> ships = sf.getShips();
         grid = new OceanGrid();
         assertTrue(5 == ships.size());
-        grid.placeShips(ships);
-        grid.print();
+        grid.assignShips(ships);
+        System.out.println(grid);
     }
 }

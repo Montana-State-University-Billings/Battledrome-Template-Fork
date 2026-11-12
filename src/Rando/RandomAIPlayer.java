@@ -3,7 +3,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// YOU'LL NEED TO UPDATE THESE IMPORTS TO MATCH YOUR PROJECT
 import Common.Player;
 import Common.Coordinate;
 import Common.ShotResult;
@@ -35,7 +34,7 @@ public class RandomAIPlayer implements Player {
 	@Override
     public void placeShips() {
         this.ships = factory.getShips();
-        oceanGrid.placeShips(this.ships);
+        oceanGrid.assignShips(this.ships);
     }
 
     @Override

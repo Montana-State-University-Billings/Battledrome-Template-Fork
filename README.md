@@ -7,29 +7,22 @@ against the included players or another student's player.
 ## Get started
 
 1. Create your own **private** fork of this project and open it in VS Code.
-2. Install a **JDK 21 or newer** and the VS Code **Extension Pack for Java**.
-   The project uses Java 21 library features.
-3. Keep the existing source files and add your code under `src/` in a package
-   of your choice. Please create a package named after yourself... I'd  `Student` belongs at
-   `src/Student/StudentPlayer.java`.
-4. Open `src/App.java` and select **Run** above `main` (or use the Java
-   Projects view). The default battle runs 1,000 games and prints the final
-   win counts.
+2. Keep the existing source files and add your code under `src/` in a package. Please create a package named after yourself... I'd make a package called `JohnPannell` and start my player class at `src/JohnPannell/JohnsPlayer.java`.
+3. To run the battledrome, open `src/App.java` and select **Run** above `main` (or use the play button). The default battle runs 1,000 games and prints the final win counts.
 
 The source folders are `src/` and `test/`; compiled classes go in `bin/`.
 The included JUnit console runner is in `lib/`.
 
 ## Create your player
 
-Your player must implement [`Common.Player`](src/Common/Player.java). In your
-own package, create a class such as:
+Your player must implement [`Common.Player`](src/Common/Player.java). For me, this might look like:
 
 ```java
-package student;
+package JohnPannell;
 
 import Common.Player;
 
-public class StudentPlayer implements Player {
+public class JohnsPlayer implements Player {
     // Implement all methods declared by Common.Player.
 }
 ```
@@ -85,10 +78,10 @@ Player player2 = new Rando.RandomAIPlayer();
 ```
 
 Replace either constructor with your fully qualified class name. For example,
-to play your `student.StudentPlayer` against Rando:
+to play my `JohnPannell.JohnsPlayer` against Rando:
 
 ```java
-Player player1 = new student.StudentPlayer();
+Player player1 = new JohnPannell.JohnsPlayer();
 Player player2 = new Rando.RandomAIPlayer();
 ```
 

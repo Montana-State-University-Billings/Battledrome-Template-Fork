@@ -38,7 +38,7 @@ public class JohnPAIPlayer implements Player {
 					try{
 						shotsToTake.add(new Coordinate(x,y));
 					} catch (Exception e){
-						// ignore - shouldn"t happen
+						// ignore - shouldn't happen
 					}
 				}
             }
